@@ -22,6 +22,12 @@
       #example_wrapper {
         width: 100% !important;
       }
+      pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+      .string { color: green; }
+      .number { color: darkorange; }
+      .boolean { color: blue; }
+      .null { color: magenta; }
+      .key { color: red; }
     </style>
   </head>
 
@@ -93,16 +99,43 @@
           </div>
         </div>  
 
+
+        <br /> <br />
+        <div class="col-md-12 order-md-1">
+         <h4 class="mb-3">Connect</h4>
+         <form class="needs-validation" novalidate>          
+          <div class="mb-3">
+            <label for="profileURL">Connect Profile URL</label>
+            <input type="text" class="form-control" id="profileURL" placeholder="" required>
+            <div class="invalid-feedback">
+              Please enter your shipping address.
+            </div>
+          </div>
+
+          <div class="mb-3">
+              <label for="searchURL">Connect Message</label>
+              <textarea id="connectMessage" class="form-control"></textarea>
+              <div class="invalid-feedback">
+                Please enter your shipping address.
+              </div>
+            </div>
+          <button class="btn btn-primary btn-lg btn-block" id="connectButton" type="button">Connect</button>
+
+          <button style="margin-top:10px;" class="btn btn-primary btn-lg btn-block" id="recentButton" type="button">Recently Connected</button>
+
+          <br />
+          <pre id="connectResponse">              
+              
+           </pre>
+        </form>
+
+       </div>  
       </div>
       
 
       <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2017-2018 Company Name</p>
-        <ul class="list-inline">
-          <li class="list-inline-item"><a href="#">Privacy</a></li>
-          <li class="list-inline-item"><a href="#">Terms</a></li>
-          <li class="list-inline-item"><a href="#">Support</a></li>
-        </ul>
+        <p class="mb-1">&copy; Linkedprospect.com</p>
+        
       </footer>
     </div>
 
@@ -121,12 +154,72 @@
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
 
     <script>
-        
+        var tblExample;
         $(document).ready(()=>{          
-            $('#searchButton').on('click',()=>{
+            tblExample = $('#example').DataTable();
+            $('#searchButton').on('click',()=>{   
+             
               fetchSearch();              
             });
+
+            $('#connectButton').on('click',()=>{
+             
+              connectProfile();
+            })
+
+            $('#recentButton').on('click',()=>{
+
+              recentConnections();
+            });
         });
+
+        function loading(btn,isLoading) {
+          var $this = $('#' + btn);
+          if(isLoading) {            
+            var loadingText = '<i class="fa fa-circle-o-notch fa-spin"></i> loading...';
+            if ($('#' + btn).html() !== loadingText) {
+              $this.data('original-text',$('#' + btn).html());
+              $this.html(loadingText);
+              $('#' + btn).prop('disabled',true);
+            }
+          }else{
+            $this.html($this.data('original-text'));
+            $('#' + btn).prop('disabled',false);
+          }          
+        }
+        
+        function recentConnections(){
+          debugger
+          let instance = axios.create({
+            baseURL: 'http://198.58.101.110:3000',
+            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
+          });
+          loading('recentButton',true);
+          instance.get('/recentConnections').then((success)=>{
+            console.log(success);   
+            $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));  
+            loading('recentButton',false);      
+          });
+        }
+
+        function connectProfile(){
+          debugger
+          let instance = axios.create({
+            baseURL: 'http://198.58.101.110:3000',
+            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
+          });
+          loading('connectButton',true);
+          instance.post('/sendConnections',{
+            "profilelist": [{
+                "url": $('#profileURL').val(),
+                "note": $('#connectMessage').val()
+              }]
+          }).then((success)=>{
+            console.log(success);   
+            $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));   
+            loading('connectButton',false);     
+          });
+        }
 
         function fetchSearch(){
             debugger
@@ -135,16 +228,13 @@
             "httpProxy": $('#proxy').val(),
             "username": $('#userName').val(),
             "password": $('#password').val()
-           }
-           var config = {
-            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
-          };
+           }           
 
           let instance = axios.create({
             baseURL: 'http://198.58.101.110:3000',
             headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
           });
-
+          loading('searchButton',true);
           instance.get('/status').then((success)=>{
             if(success.data.apiStatus=='ready' && success.data.currentUser == $('#userName').val()){
               instance.post('/searchbyUrls',{
@@ -154,7 +244,8 @@
               }).then((success)=>{
                 console.log(success);
                 fillResults(success.data);
-              })
+                loading('searchButton',true);
+              });
             }else{
               instance.post('/login',data).then((response)=>{
                 instance.post('/searchbyUrls',{
@@ -163,18 +254,22 @@
                   "start": 1
                 }).then((success)=>{
                   console.log(success);
+                  fillResults(success.data);
+                  loading('searchButton',false);
                 })
               }).
               catch((error)=>{
-                console.log(error)
+                console.log(error);
+                loading('searchButton',false);
               });
             }
           });        
           
         }
 
-        function fillResults(data){
-          $('#example').DataTable({
+        function fillResults(data){          
+          tblExample.destroy();
+          tblExample = $('#example').DataTable({
             data: data,
             columns: [
                 { data: 'name' },
@@ -183,33 +278,7 @@
                 { data: 'url' },
                 {data: 'location'}
             ]
-          })
-          // tblExample.rows()
-          //   .invalidate()
-          //   .draw();
-
-          // var body = $('#results');
-          
-          // _.map(data,(dta)=>{
-            
-          //   var tr = $('<tr></tr>')
-          //   var tdName = $('<td>'+dta.name+'</td>');
-          //   var tdCurrentJob = $('<td>'+dta.currentJob+'</td>');
-          //   var tdJob =$('<td>'+dta.job+'</td>');
-          //   var tdURL =$('<td>'+dta.url+'</td>');
-          //   var tdLocation =$('<td>'+dta.location+'</td>');
-            
-          //   tr.append(tdName);
-          //   tr.append(tdCurrentJob);
-          //   tr.append(tdJob);
-          //   tr.append(tdURL);
-          //   tr.append(tdLocation);
-
-          //   body.append(tr);
-          
-          // });
-          
-          // tblExample.rows().draw();
+          });         
 
         }
     </script>
