@@ -215,26 +215,120 @@
 
     <script>
         var tblExample;
+
+        let instance = axios.create({
+          baseURL: 'http://198.58.101.110:3000',
+          headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
+        });
+
+        let fn = {
+          autoReply : ()=>{
+            loading('autoReplyButton',true);
+            instance.post('/sendMessagesByUrl',{
+              "messageList": [{
+                  "url": $('#autoprofileURL').val(),
+                  "message": $('#autoMessage').val()
+                }]
+            }).then((success)=>{
+              console.log(success);   
+              $('#autoResponse').html(JSON.stringify(success.data, undefined, 4));   
+              loading('autoReplyButton',false);     
+            })
+            .catch((error)=>{
+              console.log(error);
+              loading('autoReplyButton',false);
+            });
+          },
+          recentConnections: ()=>{
+            loading('recentButton',true);
+            instance.get('/recentConnections').then((success)=>{
+              console.log(success);   
+              $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));  
+              loading('recentButton',false);      
+            })
+            .catch((error)=>{
+              console.log(error);
+              loading('recentButton',false);
+            });
+          },
+          connectProfile: () => {
+            loading('connectButton',true);
+            instance.post('/sendConnections',{
+              "profilelist": [{
+                  "url": $('#profileURL').val(),
+                  "note": $('#connectMessage').val()
+                }]
+            }).then((success)=>{
+              console.log(success);   
+              $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));   
+              loading('connectButton',false);     
+            })
+            .catch((error)=>{
+              console.log(error);
+              loading('connectButton',false);
+            });
+          },
+          fetchSearch: ()=> {
+            let data = {
+              "userAgent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.302",
+              "httpProxy": $('#proxy').val(),
+              "username": $('#userName').val(),
+              "password": $('#password').val()
+            }         
+
+            loading('searchButton',true);
+            instance.get('/status').then((success)=>{
+              if(success.data.apiStatus=='ready' && success.data.currentUser == $('#userName').val()){
+                instance.post('/searchbyUrls',{
+                  "urls": [$('#searchURL').val()],
+                  "numberOfPage": 1,
+                  "start": 1
+                }).then((success)=>{
+                  console.log(success);
+                  fillResults(success.data);
+                  loading('searchButton',false);
+                  $('#toggle').show();
+                });
+              }else{
+                instance.post('/login',data).then((response)=>{
+                  instance.post('/searchbyUrls',{
+                    "urls": [$('#searchURL').val()],
+                    "numberOfPage": 1,
+                    "start": 1
+                  }).then((success)=>{
+                    console.log(success);
+                    fillResults(success.data);
+                    loading('searchButton',false);
+                    $('#toggle').show();
+                  })
+                }).
+                catch((error)=>{
+                  console.log(error);
+                  loading('searchButton',false);
+                  $('#toggle').show();
+                });
+              }
+            }); 
+          }
+        }
+
         $(document).ready(()=>{          
             tblExample = $('#example').DataTable();
             $('#toggle').hide();
             $('#searchButton').on('click',()=>{   
-             
-              fetchSearch();              
+              fn.fetchSearch();              
             });
 
-            $('#connectButton').on('click',()=>{
-             
-              connectProfile();
+            $('#connectButton').on('click',()=>{             
+              fn.connectProfile();
             })
 
             $('#recentButton').on('click',()=>{
-
-              recentConnections();
+              fn.recentConnections();
             });
 
             $('#autoReplyButton').on('click',()=>{
-              autoReply();
+              fn.autoReply();
             });
         });
 
@@ -252,119 +346,6 @@
             $('#' + btn).prop('disabled',false);
           }          
         }
-        
-        function autoReply(){
-          debugger
-          let instance = axios.create({
-            baseURL: 'http://198.58.101.110:3000',
-            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
-          });
-          loading('autoReplyButton',true);
-          instance.post('/sendMessagesByUrl',{
-            "messageList": [{
-                "url": $('#autoprofileURL').val(),
-                "message": $('#autoMessage').val()
-              }]
-          }).then((success)=>{
-            console.log(success);   
-            $('#autoResponse').html(JSON.stringify(success.data, undefined, 4));   
-            loading('autoReplyButton',false);     
-          })
-          .catch((error)=>{
-            console.log(error);
-            loading('autoReplyButton',false);
-          });
-        }
-
-        function recentConnections(){
-          debugger
-          let instance = axios.create({
-            baseURL: 'http://198.58.101.110:3000',
-            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
-          });
-          loading('recentButton',true);
-          instance.get('/recentConnections').then((success)=>{
-            console.log(success);   
-            $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));  
-            loading('recentButton',false);      
-          })
-          .catch((error)=>{
-            console.log(error);
-            loading('recentButton',false);
-          });
-        }
-
-        function connectProfile(){
-          debugger
-          let instance = axios.create({
-            baseURL: 'http://198.58.101.110:3000',
-            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
-          });
-          loading('connectButton',true);
-          instance.post('/sendConnections',{
-            "profilelist": [{
-                "url": $('#profileURL').val(),
-                "note": $('#connectMessage').val()
-              }]
-          }).then((success)=>{
-            console.log(success);   
-            $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));   
-            loading('connectButton',false);     
-          })
-          .catch((error)=>{
-            console.log(error);
-            loading('connectButton',false);
-          });
-        }
-
-        function fetchSearch(){
-            debugger
-           let data = {
-            "userAgent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.302",
-            "httpProxy": $('#proxy').val(),
-            "username": $('#userName').val(),
-            "password": $('#password').val()
-           }           
-
-          let instance = axios.create({
-            baseURL: 'http://198.58.101.110:3000',
-            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
-          });
-          loading('searchButton',true);
-          instance.get('/status').then((success)=>{
-            if(success.data.apiStatus=='ready' && success.data.currentUser == $('#userName').val()){
-              instance.post('/searchbyUrls',{
-                "urls": [$('#searchURL').val()],
-                "numberOfPage": 1,
-                "start": 1
-              }).then((success)=>{
-                console.log(success);
-                fillResults(success.data);
-                loading('searchButton',false);
-                $('#toggle').show();
-              });
-            }else{
-              instance.post('/login',data).then((response)=>{
-                instance.post('/searchbyUrls',{
-                  "urls": [$('#searchURL').val()],
-                  "numberOfPage": 1,
-                  "start": 1
-                }).then((success)=>{
-                  console.log(success);
-                  fillResults(success.data);
-                  loading('searchButton',false);
-                  $('#toggle').show();
-                })
-              }).
-              catch((error)=>{
-                console.log(error);
-                loading('searchButton',false);
-                $('#toggle').show();
-              });
-            }
-          });        
-          
-        }
 
         function fillResults(data){          
           tblExample.destroy();
@@ -380,6 +361,7 @@
           });         
 
         }
+        
     </script>
   </body>
 </html>
