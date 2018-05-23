@@ -20,7 +20,8 @@
 
     <style>
       #example_wrapper {
-        width: 100% !important;
+        width: 95% !important;
+        margin:auto;
       }
       pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
       .string { color: green; }
@@ -40,44 +41,47 @@
         <p class="lead">This is a LinkedInProspect test page</p>
       </div>
 
-      
-        <div class="col-md-12 order-md-1">
-          <h4 class="mb-3">Linked In Credetials</h4>
-          <form class="needs-validation" novalidate>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="userName">Linkedin UserName</label>
-                <input type="email" class="form-control" id="userName" placeholder="" value="" required>
-                <div class="invalid-feedback">
-                  Valid first name is required.
-                </div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="lastName">Linkedin password</label>
-                <input type="password" class="form-control" id="password" placeholder="" value="" required>
-                <div class="invalid-feedback">
-                  Valid last name is required.
-                </div>
+      <div class="col-md-12 order-md-1">
+        <h4 class="mb-3">Linked In Credetials</h4>
+        <form class="needs-validation" novalidate>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="userName">Linkedin UserName</label>
+              <input type="email" class="form-control" id="userName" placeholder="" value="" required>
+              <div class="invalid-feedback">
+                Valid first name is required.
               </div>
             </div>
-            <div class="mb-3">
-              <label for="proxy">Proxy</label>
-              <input type="text" class="form-control" id="proxy" placeholder="" required>
+            <div class="col-md-6 mb-3">
+              <label for="lastName">Linkedin password</label>
+              <input type="password" class="form-control" id="password" placeholder="" value="" required>
+              <div class="invalid-feedback">
+                Valid last name is required.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="proxy">Proxy</label>
+            <input type="text" class="form-control" id="proxy" placeholder="" required>
+            <div class="invalid-feedback">
+              Please enter your shipping address.
+            </div>
+          </div>
+
+          <div class="mb-3">
+              <label for="searchURL">Search URL</label>
+              <input type="text" class="form-control" id="searchURL" placeholder="" required>
               <div class="invalid-feedback">
                 Please enter your shipping address.
               </div>
             </div>
+          <button class="btn btn-primary btn-lg btn-block" id="searchButton" type="button">Search</button>
+        </form>
+      </div>
 
-            <div class="mb-3">
-                <label for="searchURL">Search URL</label>
-                <input type="text" class="form-control" id="searchURL" placeholder="" required>
-                <div class="invalid-feedback">
-                  Please enter your shipping address.
-                </div>
-              </div>
-            <button class="btn btn-primary btn-lg btn-block" id="searchButton" type="button">Search</button>
-          </form>
-        </div>
+
+      <div id="toggle">
+        
         <br /> <br />
          <div class="col-md-12 order-md-1">
           <h4 class="mb-3">Search Results</h4>
@@ -98,38 +102,94 @@
             </table>
           </div>
         </div>  
+        <br /> 
+        <hr />
+        <br />
+        <div class="row">
+          <div class="col-md-12 order-md-1">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" href="#connect" role="tab" data-toggle="tab">Connect</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#autoreply" role="tab" data-toggle="tab">Auto Reply</a>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active in " id="connect">
+                <br />
+                <div class="col-md-12 order-md-1">
+                  <h4 class="mb-3">Connect</h4>
+                  <form class="needs-validation" novalidate>          
+                   <div class="mb-3">
+                     <label for="profileURL">Connect Profile URL</label>
+                     <input type="text" class="form-control" id="profileURL" placeholder="" required>
+                     <div class="invalid-feedback">
+                       Please enter your shipping address.
+                     </div>
+                   </div>
+         
+                   <div class="mb-3">
+                       <label for="searchURL">Connect Message</label>
+                       <textarea id="connectMessage" class="form-control"></textarea>
+                       <div class="invalid-feedback">
+                         Please enter your shipping address.
+                       </div>
+                     </div>
+                   <button class="btn btn-primary btn-lg btn-block" id="connectButton" type="button">Connect</button>
+         
+                   <button style="margin-top:10px;" class="btn btn-primary btn-lg btn-block" id="recentButton" type="button">Recently Connected</button>
+         
+                   <br />
+                   <pre id="connectResponse">              
+                       
+                    </pre>
+                 </form>
+         
+                </div>  
+
+              </div>
 
 
-        <br /> <br />
-        <div class="col-md-12 order-md-1">
-         <h4 class="mb-3">Connect</h4>
-         <form class="needs-validation" novalidate>          
-          <div class="mb-3">
-            <label for="profileURL">Connect Profile URL</label>
-            <input type="text" class="form-control" id="profileURL" placeholder="" required>
-            <div class="invalid-feedback">
-              Please enter your shipping address.
-            </div>
-          </div>
 
-          <div class="mb-3">
-              <label for="searchURL">Connect Message</label>
-              <textarea id="connectMessage" class="form-control"></textarea>
-              <div class="invalid-feedback">
-                Please enter your shipping address.
+              <div role="tabpanel" class="tab-pane fade" id="autoreply">
+                <br />
+                <div class="col-md-12 order-md-1">
+                  <h4 class="mb-3">Auto Reply</h4>
+                  <form class="needs-validation" novalidate>          
+                   <div class="mb-3">
+                     <label for="profileURL">Profile URL</label>
+                     <input type="text" class="form-control" id="autoprofileURL" placeholder="" required>
+                     <div class="invalid-feedback">
+                       Please enter your shipping address.
+                     </div>
+                   </div>
+         
+                   <div class="mb-3">
+                       <label for="searchURL">Message</label>
+                       <textarea id="autoMessage" class="form-control"></textarea>
+                       <div class="invalid-feedback">
+                         Please enter your shipping address.
+                       </div>
+                     </div>
+                   <button class="btn btn-primary btn-lg btn-block" id="autoReplyButton" type="button">Reply</button>
+         
+         
+                   <br />
+                   <pre id="autoResponse">              
+                       
+                    </pre>
+                 </form>
+         
+                </div>  
+
               </div>
             </div>
-          <button class="btn btn-primary btn-lg btn-block" id="connectButton" type="button">Connect</button>
-
-          <button style="margin-top:10px;" class="btn btn-primary btn-lg btn-block" id="recentButton" type="button">Recently Connected</button>
-
-          <br />
-          <pre id="connectResponse">              
-              
-           </pre>
-        </form>
-
-       </div>  
+          </div>
+        </div>
+      </div>
+       
       </div>
       
 
@@ -157,6 +217,7 @@
         var tblExample;
         $(document).ready(()=>{          
             tblExample = $('#example').DataTable();
+            $('#toggle').hide();
             $('#searchButton').on('click',()=>{   
              
               fetchSearch();              
@@ -170,6 +231,10 @@
             $('#recentButton').on('click',()=>{
 
               recentConnections();
+            });
+
+            $('#autoReplyButton').on('click',()=>{
+              autoReply();
             });
         });
 
@@ -188,6 +253,29 @@
           }          
         }
         
+        function autoReply(){
+          debugger
+          let instance = axios.create({
+            baseURL: 'http://198.58.101.110:3000',
+            headers: {'x-authentication':'jnMNQbUpFvBkpPdY'}
+          });
+          loading('autoReplyButton',true);
+          instance.post('/sendMessagesByUrl',{
+            "messageList": [{
+                "url": $('#autoprofileURL').val(),
+                "message": $('#autoMessage').val()
+              }]
+          }).then((success)=>{
+            console.log(success);   
+            $('#autoResponse').html(JSON.stringify(success.data, undefined, 4));   
+            loading('autoReplyButton',false);     
+          })
+          .catch((error)=>{
+            console.log(error);
+            loading('autoReplyButton',false);
+          });
+        }
+
         function recentConnections(){
           debugger
           let instance = axios.create({
@@ -199,6 +287,10 @@
             console.log(success);   
             $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));  
             loading('recentButton',false);      
+          })
+          .catch((error)=>{
+            console.log(error);
+            loading('recentButton',false);
           });
         }
 
@@ -218,6 +310,10 @@
             console.log(success);   
             $('#connectResponse').html(JSON.stringify(success.data, undefined, 4));   
             loading('connectButton',false);     
+          })
+          .catch((error)=>{
+            console.log(error);
+            loading('connectButton',false);
           });
         }
 
@@ -244,7 +340,8 @@
               }).then((success)=>{
                 console.log(success);
                 fillResults(success.data);
-                loading('searchButton',true);
+                loading('searchButton',false);
+                $('#toggle').show();
               });
             }else{
               instance.post('/login',data).then((response)=>{
@@ -256,11 +353,13 @@
                   console.log(success);
                   fillResults(success.data);
                   loading('searchButton',false);
+                  $('#toggle').show();
                 })
               }).
               catch((error)=>{
                 console.log(error);
                 loading('searchButton',false);
+                $('#toggle').show();
               });
             }
           });        
