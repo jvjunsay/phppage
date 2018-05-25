@@ -41,9 +41,19 @@
         <p class="lead">This is a LinkedInProspect test page</p>
       </div>
 
-      <div class="col-md-12 order-md-1">
-        <h4 class="mb-3">Linked In Credetials</h4>
-        <form class="needs-validation" novalidate>
+      <div id="main" class="col-md-12 order-md-1">
+          <div class="row">
+              <div class="col-md-12 order-md-1">
+                  <h4 class="mb-3">API Status</h4>
+                  
+                  <pre id="statusResponse">              
+                      
+                  </pre>
+              </div>
+          </div>
+          <br />
+        <h4 class="mb-3">Linked In Credentials</h4>
+        <form class="needs-validation" novalidate id="main">
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="userName">Linkedin UserName</label>
@@ -77,9 +87,30 @@
             </div>
           <button class="btn btn-primary btn-lg btn-block" id="searchButton" type="button">Search</button>
         </form>
+        <hr />
+        <form id="setPin"  >
+          
+
+            <div class="mb-3">
+              <label for="userName">Pin Number</label>
+              <input type="email" class="form-control" id="pin" placeholder="" value="" required>
+              <div class="invalid-feedback">
+                Valid first name is required.
+              </div>
+            </div>
+          
+          <button class="btn btn-primary btn-lg btn-block" id="setPinButton" type="button">Send Pin</button>
+
+          <br />
+          <pre id="pinResponse">              
+              
+          </pre>
+          <br />
+        </form>
+
       </div>
-
-
+      
+      
       <div id="toggle">
         
         <br /> <br />
@@ -222,6 +253,25 @@
         });
 
         let fn = {
+          getStatus: ()=> {
+            instance.get('/status').then((success)=>{
+              $('#statusResponse').html(JSON.stringify(success.data, undefined, 4));  
+            })
+          },     
+          sendPin: ()=> {
+            loading('setPinButton',true);
+            instance.post('/pin',{
+              pin: $('#pin').val()
+            }).then((success)=>{
+              console.log(success);   
+              $('#pinResponse').html(JSON.stringify(success.data, undefined, 4));   
+              loading('setPinButton',false);     
+            })
+            .catch((error)=>{
+              console.log(error);
+              loading('setPinButton',false);
+            });
+          },    
           autoReply : ()=>{
             loading('autoReplyButton',true);
             instance.post('/sendMessagesByUrl',{
@@ -288,19 +338,23 @@
                   fillResults(success.data);
                   loading('searchButton',false);
                   $('#toggle').show();
+                }).catch((error)=>{
+                  console.log(error)
                 });
               }else{
-                instance.post('/login',data).then((response)=>{
-                  instance.post('/searchbyUrls',{
-                    "urls": [$('#searchURL').val()],
-                    "numberOfPage": 1,
-                    "start": 1
-                  }).then((success)=>{
-                    console.log(success);
-                    fillResults(success.data);
-                    loading('searchButton',false);
-                    $('#toggle').show();
-                  })
+                instance.post('/firstlogin',data).then((response)=>{
+                  instance.post('/login',data).then((response)=>{
+                    instance.post('/searchbyUrls',{
+                      "urls": [$('#searchURL').val()],
+                      "numberOfPage": 1,
+                      "start": 1
+                    }).then((success)=>{
+                      console.log(success);
+                      fillResults(success.data);
+                      loading('searchButton',false);
+                      $('#toggle').show();
+                    })
+                  });
                 }).
                 catch((error)=>{
                   console.log(error);
@@ -330,6 +384,17 @@
             $('#autoReplyButton').on('click',()=>{
               fn.autoReply();
             });
+            
+            $('#setPinButton').on('click',()=>{
+              fn.sendPin();
+            });
+
+            setInterval(function(){
+             
+              instance.get('/status').then((success)=>{
+                $('#statusResponse').html(JSON.stringify(success.data, undefined, 4));  
+              })
+            }, 2000);
         });
 
         function loading(btn,isLoading) {
